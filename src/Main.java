@@ -128,14 +128,14 @@ public class Main {
         final int discount = calculationResult[3];
         final int finalTotal = calculationResult[4];
         
-        if (drinkDiscount > 0) {
-            System.out.println("Promo Beli 1 Gratis 1 Minuman: -Rp " + drinkDiscount);
-        }
-        
         if (discount > 0) {
             System.out.println("Diskon 10%: -Rp " + discount);
         }
-        
+
+        if (drinkDiscount > 0) {
+            System.out.println("Promo Beli 1 Gratis 1 Minuman: -Rp " + drinkDiscount);
+        }
+                
         System.out.println("Pajak 10%: Rp " + tax);
         System.out.println("Biaya Pelayanan: Rp " + serviceFee);
         
@@ -153,9 +153,15 @@ public class Main {
     }
     
     public static int[] calculateTotalCost(int subtotal) {
-        int drinkDiscount = 0;
+        int discount = 0;
+        if (subtotal > 100000) {
+            discount = (int)(subtotal * 0.1);
+        }
         
-        if (subtotal > 50000) {
+        final int totalAfterDiscount = subtotal - discount;
+        
+        int drinkDiscount = 0;
+        if (totalAfterDiscount > 50000) {
             int cheapestPrice = Integer.MAX_VALUE;
             boolean hasEligibleDrink = false;
             
@@ -189,17 +195,10 @@ public class Main {
             }
         }
         
-        final int totalAfterPromo = subtotal - drinkDiscount;
-        
-        int discount = 0;
-        if (totalAfterPromo > 100000) {
-            discount = (int)(totalAfterPromo * 0.1);
-        } 
-        
-        final int totalAfterDiscount = totalAfterPromo - discount;
-        final int tax = (int)(totalAfterDiscount * 0.1);
+        final int totalAfterPromo = totalAfterDiscount - drinkDiscount;
+        final int tax = (int)(totalAfterPromo * 0.1);
         final int serviceFee = 20000;
-        final int finalTotal = totalAfterDiscount + tax + serviceFee;
+        final int finalTotal = totalAfterPromo + tax + serviceFee;
         
         return new int[]{drinkDiscount, tax, serviceFee, discount, finalTotal};
     }
