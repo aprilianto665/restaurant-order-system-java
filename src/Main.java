@@ -1,5 +1,9 @@
 import java.util.Scanner;
 
+/**
+ * Restaurant Order System - Main class for processing food and drink orders
+ * with discount and promotional calculations
+ */
 public class Main {
     private static final Menu[] menuList = {
         new Menu("Nasi Padang", 25000, "makanan"),
@@ -15,6 +19,10 @@ public class Main {
     private static Menu[] orders = new Menu[4];
     private static int[] quantities = new int[4];
 
+    /**
+     * Main method to run the restaurant order system
+     * @param args Command line arguments
+     */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
@@ -31,6 +39,9 @@ public class Main {
         scanner.close();
     }
 
+    /**
+     * Displays the restaurant menu with food and drink categories
+     */
     public static void displayMenu() {
         System.out.println("=== DAFTAR MENU ===");
         
@@ -47,7 +58,14 @@ public class Main {
         System.out.println("- " + menuList[7].getName() + " : Rp " + menuList[7].getPrice());
     }
 
-        public static boolean inputOrder(Scanner scanner, int orderNumber, int index) {
+    /**
+     * Handles user input for ordering items
+     * @param scanner Scanner object for reading user input
+     * @param orderNumber The order number being processed (1-4)
+     * @param index Array index for storing the order
+     * @return true if user wants to finish ordering, false to continue
+     */
+    public static boolean inputOrder(Scanner scanner, int orderNumber, int index) {
         System.out.print("Pesanan " + orderNumber + ": ");
         String input = scanner.nextLine();
         
@@ -64,7 +82,13 @@ public class Main {
         return false;
     }
 
-        public static boolean processInput(String input, int index) {
+    /**
+     * Processes the user input to match menu items and quantities
+     * @param input User input in format "menu name=quantity"
+     * @param index Array index for storing the processed order
+     * @return true if input is valid and processed successfully, false otherwise
+     */
+    public static boolean processInput(String input, int index) {
         final String[] parts = input.split("=");
         final String menuName = parts[0].trim().toLowerCase();
         final int quantity = Integer.parseInt(parts[1].trim());
@@ -108,6 +132,10 @@ public class Main {
         return true;
     }
 
+    /**
+     * Prints the complete receipt with all calculations including discounts,
+     * promotions, tax, and service fee
+     */
     public static void printReceipt() {
         System.out.println("\n=== STRUK PESANAN ===");
         
@@ -143,6 +171,11 @@ public class Main {
         System.out.println("TOTAL BAYAR: Rp " + finalTotal);
     }
 
+    /**
+     * Displays a single order item with quantity and calculates its total price
+     * @param index Array index of the order item
+     * @return Total price for the item (price × quantity)
+     */
     public static int displayOrderItem(int index) {
         if (orders[index] != null) {
             final int total = orders[index].getPrice() * quantities[index];
@@ -152,6 +185,14 @@ public class Main {
         return 0;
     }
     
+    /**
+     * Calculates the total cost with discounts and promotions applied in correct order:
+     * 1. Apply 10% discount if subtotal > 100,000
+     * 2. Apply buy-1-get-1-free drink promo if total after discount > 50,000
+     * 3. Calculate 10% tax and add 20,000 service fee
+     * @param subtotal The initial subtotal before any discounts
+     * @return Array containing [drinkDiscount, tax, serviceFee, discount, finalTotal]
+     */
     public static int[] calculateTotalCost(int subtotal) {
         int discount = 0;
         if (subtotal > 100000) {
@@ -204,6 +245,11 @@ public class Main {
     }
     
     
+    /**
+     * Checks if the order item at the specified index is a drink
+     * @param index Array index of the order item to check
+     * @return true if the item is a drink, false otherwise
+     */
     public static boolean isDrink(int index) {
         Menu order = orders[index];
         return order != null && order.getCategory().equals("minuman");
