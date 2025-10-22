@@ -26,7 +26,8 @@ public class Main {
         if (inputOrder(scanner, 2, 1)) return;
         if (inputOrder(scanner, 3, 2)) return;
         if (inputOrder(scanner, 4, 3)) return;
-        
+
+        printReceipt();
         scanner.close();
     }
 
@@ -51,6 +52,7 @@ public class Main {
         String input = scanner.nextLine();
         
         if (input.equalsIgnoreCase("selesai")) {
+            printReceipt();
             scanner.close();
             return true;
         } else if (input.trim().isEmpty()) {
@@ -104,5 +106,107 @@ public class Main {
         
         quantities[index] = quantity;
         return true;
+    }
+
+    public static void printReceipt() {
+        System.out.println("\n=== STRUK PESANAN ===");
+        
+        int subtotal = 0;
+        
+        subtotal += displayOrderItem(0);
+        subtotal += displayOrderItem(1);
+        subtotal += displayOrderItem(2);
+        subtotal += displayOrderItem(3);
+        
+        System.out.println("---------------------");
+        System.out.println("Subtotal: Rp " + subtotal);
+        
+        final int[] calculationResult = calculateTotalCost(subtotal);
+        final int drinkDiscount = calculationResult[0];
+        final int tax = calculationResult[1];
+        final int serviceFee = calculationResult[2];
+        final int discount = calculationResult[3];
+        final int finalTotal = calculationResult[4];
+        
+        if (drinkDiscount > 0) {
+            System.out.println("Promo Beli 1 Gratis 1 Minuman: -Rp " + drinkDiscount);
+        }
+        
+        if (discount > 0) {
+            System.out.println("Diskon 10%: -Rp " + discount);
+        }
+        
+        System.out.println("Pajak 10%: Rp " + tax);
+        System.out.println("Biaya Pelayanan: Rp " + serviceFee);
+        
+        System.out.println("=====================");
+        System.out.println("TOTAL BAYAR: Rp " + finalTotal);
+    }
+
+    public static int displayOrderItem(int index) {
+        if (orders[index] != null) {
+            final int total = orders[index].getPrice() * quantities[index];
+            System.out.println(orders[index].getName() + " x" + quantities[index] + " = Rp " + total);
+            return total;
+        }
+        return 0;
+    }
+    
+    public static int[] calculateTotalCost(int subtotal) {
+        int drinkDiscount = 0;
+        
+        if (subtotal > 50000) {
+            int cheapestPrice = Integer.MAX_VALUE;
+            boolean hasEligibleDrink = false;
+            
+            if (isDrink(0)) {
+                if (quantities[0] > 1) {
+                    cheapestPrice = Math.min(cheapestPrice, orders[0].getPrice());
+                    hasEligibleDrink = true;
+                }
+            }
+            if (isDrink(1)) {
+                if (quantities[1] > 1) {
+                    cheapestPrice = Math.min(cheapestPrice, orders[1].getPrice());
+                    hasEligibleDrink = true;
+                }
+            }
+            if (isDrink(2)) {
+                if (quantities[2] > 1) {
+                    cheapestPrice = Math.min(cheapestPrice, orders[2].getPrice());
+                    hasEligibleDrink = true;
+                }
+            }
+            if (isDrink(3)) {
+                if (quantities[3] > 1) {
+                    cheapestPrice = Math.min(cheapestPrice, orders[3].getPrice());
+                    hasEligibleDrink = true;
+                }
+            }
+            
+            if (hasEligibleDrink) {
+                drinkDiscount = cheapestPrice;
+            }
+        }
+        
+        final int totalAfterPromo = subtotal - drinkDiscount;
+        
+        int discount = 0;
+        if (totalAfterPromo > 100000) {
+            discount = (int)(totalAfterPromo * 0.1);
+        } 
+        
+        final int totalAfterDiscount = totalAfterPromo - discount;
+        final int tax = (int)(totalAfterDiscount * 0.1);
+        final int serviceFee = 20000;
+        final int finalTotal = totalAfterDiscount + tax + serviceFee;
+        
+        return new int[]{drinkDiscount, tax, serviceFee, discount, finalTotal};
+    }
+    
+    
+    public static boolean isDrink(int index) {
+        Menu order = orders[index];
+        return order != null && order.getCategory().equals("minuman");
     }
 }
